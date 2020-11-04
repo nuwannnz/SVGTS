@@ -1,0 +1,23 @@
+{
+  "name": "svgts",
+  "version": "0.0.1",
+  "description": "A simple SVG library to draw polylines with support to TypeScript",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "prepare": "npm run build",
+    "build:example": "tsc ./example/test.ts --lib 'es2015,dom' && browserify ./example/test.js -o ./example/bundle.js ",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["svg", "ts", "typescript"],
+  "author": "Nuwan Karunarathna",
+  "license": "ISC",
+  "dependencies": {
+    "@types/uuid": "^8.3.0",
+    "uuid": "^8.3.1"
+  }
+}
