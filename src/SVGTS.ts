@@ -1,4 +1,4 @@
-import {  v4 as UUID} from "uuid";
+import { v4 as UUID } from "uuid";
 
 type SVGDocSize = {
   width: number | string;
@@ -6,29 +6,58 @@ type SVGDocSize = {
 };
 
 type SVGTSPolylinePoints = [number, number][];
-type SVGTSPolylineClickHandler = (id:string) => void;
+type SVGTSPolylineMouseEventHandler = (id: string) => void;
 
 export class SVGTSPolyline {
   private points: SVGTSPolylinePoints = [];
   private svgDoc: SVGElement;
-  private polylineElement: SVGPolylineElement;
+  private polylineElement!: SVGPolylineElement;
+  private onClickCb: SVGTSPolylineMouseEventHandler;
+  private onMouseMoveCb: SVGTSPolylineMouseEventHandler;
 
-  constructor(svgDoc: SVGElement, onClickCb:SVGTSPolylineClickHandler ) {
+  constructor(
+    svgDoc: SVGElement,
+    onClickCb: SVGTSPolylineMouseEventHandler,
+    onMouseMoveCb: SVGTSPolylineMouseEventHandler,
+    lineId: string = ""
+  ) {
     this.svgDoc = svgDoc;
-    this.polylineElement = document.createElementNS(
-      "http://www.w3.org/2000/svg",
-      "polyline"
-    );
-    this.polylineElement.id = UUID();
-    this.polylineElement.addEventListener('click', () =>{
-        onClickCb(this.polylineElement.id);
-    })
-    this.svgDoc.appendChild(this.polylineElement);
+    this.onClickCb = onClickCb;
+    this.onMouseMoveCb = onMouseMoveCb;
+
+    this.init(lineId);
+  }
+
+  private init(lineId: string) {
+    if (lineId) {
+      // load existing element
+      this.polylineElement = (document.getElementById(
+        lineId
+      ) as any) as SVGPolylineElement;
+    } else {
+      // create new element
+      this.polylineElement = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "polyline"
+      );
+
+      this.polylineElement.id = UUID();
+
+      this.polylineElement.addEventListener("click", () => {
+        this.onClickCb(this.polylineElement.id);
+      });
+
+      this.polylineElement.addEventListener("mousemove", () => {
+        this.onMouseMoveCb(this.polylineElement.id);
+      });
+
+      this.svgDoc.appendChild(this.polylineElement);
+    }
     this.stroke();
   }
 
-  get Id(){
-      return this.polylineElement.id;
+  get Id() {
+    return this.polylineElement.id;
   }
 
   draw(points: SVGTSPolylinePoints) {
@@ -42,28 +71,31 @@ export class SVGTSPolyline {
     return this;
   }
 
-  extend(x:number, y:number){
+  extend(x: number, y: number) {
     this.points.push([x, y]);
     return this.draw(this.points);
   }
 
-  stroke(width=2, color="#000"){
-      this.polylineElement.style.fill ='none';
-      this.polylineElement.style.stroke =color;
-      this.polylineElement.style.strokeWidth = `${width}`;
-      return this;
+  stroke(width = 2, color = "#000") {
+    this.polylineElement.style.fill = "none";
+    this.polylineElement.style.stroke = color;
+    this.polylineElement.style.strokeWidth = `${width}`;
+    return this;
   }
 
+  remove() {
+    this.svgDoc.removeChild(this.polylineElement);
+  }
 }
 
 export class SVGTS {
   private containerElement: HTMLElement;
   private svgDoc: SVGElement;
-  private clickCb:SVGTSPolylineClickHandler;
+  private clickListners: SVGTSPolylineMouseEventHandler[] = [];
+  private mouseMoveListners: SVGTSPolylineMouseEventHandler[] = [];
 
   constructor(
-    container: HTMLElement,    
-    clickCb: SVGTSPolylineClickHandler,
+    container: HTMLElement,
     size: SVGDocSize = { width: "100%", height: "100%" }
   ) {
     this.containerElement = container;
@@ -73,16 +105,44 @@ export class SVGTS {
     this.svgDoc.setAttribute("height", `${size.height}`);
 
     this.containerElement.appendChild(this.svgDoc);
-    this.clickCb = clickCb;
 
     this.handlePolylineClicked = this.handlePolylineClicked.bind(this);
+    this.handlePolylineMouseMoved = this.handlePolylineMouseMoved.bind(this);
   }
 
-  private handlePolylineClicked(clickedLineId:string){
-    this.clickCb(clickedLineId);
+  private handlePolylineClicked(clickedLineId: string) {
+    this.clickListners.forEach((cb) => cb(clickedLineId));
+  }
+
+  private handlePolylineMouseMoved(clickedLineId: string) {
+    this.mouseMoveListners.forEach((cb) => cb(clickedLineId));
+  }
+
+  addPolylineClickListner(cb: SVGTSPolylineMouseEventHandler) {
+    this.clickListners.push(cb);
+  }
+
+  addPolylineMouseMoveListner(cb: SVGTSPolylineMouseEventHandler) {
+    this.mouseMoveListners.push(cb);
   }
 
   createPolyline() {
-    return new SVGTSPolyline(this.svgDoc, this.handlePolylineClicked);
+    return new SVGTSPolyline(
+      this.svgDoc,
+      this.handlePolylineClicked,
+      this.handlePolylineMouseMoved
+    );
+  }
+
+  getPolyline(lineId: string) {
+    if (!document.getElementById(lineId)) {
+      return null;
+    }
+    return new SVGTSPolyline(
+      this.svgDoc,
+      this.handlePolylineClicked,
+      this.handlePolylineMouseMoved,
+      lineId
+    );
   }
 }
