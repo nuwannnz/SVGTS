@@ -34,6 +34,15 @@ export class SVGTSPolyline {
       this.polylineElement = (document.getElementById(
         lineId
       ) as any) as SVGPolylineElement;
+      if (this.polylineElement.hasAttributeNS(null, "points")) {
+        this.points = this.polylineElement
+          .getAttributeNS(null, "points")
+          ?.split(" ")
+          .map((p) => {
+            const pointsStr = p.split(",");
+            return [parseInt(pointsStr[0]), parseInt(pointsStr[0])];
+          }) as SVGTSPolylinePoints;
+      }
     } else {
       // create new element
       this.polylineElement = document.createElementNS(
@@ -52,8 +61,8 @@ export class SVGTSPolyline {
       });
 
       this.svgDoc.appendChild(this.polylineElement);
+      this.stroke();
     }
-    this.stroke();
   }
 
   get Id() {
