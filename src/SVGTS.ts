@@ -69,6 +69,10 @@ export class SVGTSPolyline {
     return this.polylineElement.id;
   }
 
+  set Id(newId: string) {
+    this.polylineElement.id = newId;
+  }
+
   draw(points: SVGTSPolylinePoints) {
     this.points = points;
 
