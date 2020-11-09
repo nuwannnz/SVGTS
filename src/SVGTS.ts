@@ -1,6 +1,9 @@
 import { SVGTSPolyline } from "./SVGTSPolyline";
 import { SVGTSCircle } from "./SVGTSCircle";
 
+export * from "./SVGTSCircle";
+export * from "./SVGTSPolyline";
+
 export type SVGTSMouseEventHandler = (id: string) => void;
 
 type SVGDocSize = {
