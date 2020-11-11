@@ -9,6 +9,7 @@ export class SVGTSCircle {
   private circleElement!: SVGCircleElement;
   private onClickCb: SVGTSMouseEventHandler;
   private onMouseMoveCb: SVGTSMouseEventHandler;
+  private injected = false;
 
   constructor(
     svgDoc: SVGElement,
@@ -49,17 +50,22 @@ export class SVGTSCircle {
 
       this.circleElement.id = UUID();
 
-      this.circleElement.addEventListener("click", () => {
-        this.onClickCb(this.circleElement.id);
-      });
-
-      this.circleElement.addEventListener("mousemove", () => {
-        this.onMouseMoveCb(this.circleElement.id);
-      });
+      this.initEventListners();
 
       this.svgDoc.appendChild(this.circleElement);
+      this.injected = true;
       this.fill();
     }
+  }
+
+  private initEventListners() {
+    this.circleElement.addEventListener("click", () => {
+      this.onClickCb(this.circleElement.id);
+    });
+
+    this.circleElement.addEventListener("mousemove", () => {
+      this.onMouseMoveCb(this.circleElement.id);
+    });
   }
 
   get Id() {
@@ -91,6 +97,17 @@ export class SVGTSCircle {
   }
 
   remove() {
+    if (!this.injected) {
+      return;
+    }
     this.svgDoc.removeChild(this.circleElement);
+  }
+
+  inject() {
+    if (this.injected) {
+      return;
+    }
+    this.svgDoc.appendChild(this.circleElement);
+    this.initEventListners();
   }
 }
