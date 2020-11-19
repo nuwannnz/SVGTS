@@ -19,7 +19,8 @@ export class SVGTS {
 
   constructor(
     container: HTMLElement,
-    size: SVGDocSize = { width: "100%", height: "100%" }
+    size: SVGDocSize = { width: "100%", height: "100%" },
+    viewbox?: SVGFitToViewBox
   ) {
     this.containerElement = container;
     this.svgDoc = document.createElementNS("http://www.w3.org/2000/svg", "svg");
@@ -63,6 +64,10 @@ export class SVGTS {
       this.handleShapeClicked,
       this.handleMouseMovedOverShape
     );
+  }
+
+  getSvgElement() {
+    return this.svgDoc;
   }
 
   getPolyline(lineId: string) {
