@@ -20,15 +20,20 @@ export class SVGTS {
   constructor(
     container: HTMLElement,
     size: SVGDocSize = { width: "100%", height: "100%" },
-    viewbox?: SVGFitToViewBox
+    svgElement?: SVGElement
   ) {
     this.containerElement = container;
-    this.svgDoc = document.createElementNS("http://www.w3.org/2000/svg", "svg");
-
+    if (svgElement) {
+      this.svgDoc = svgElement;
+    } else {
+      this.svgDoc = document.createElementNS(
+        "http://www.w3.org/2000/svg",
+        "svg"
+      );
+      this.containerElement.appendChild(this.svgDoc);
+    }
     this.svgDoc.setAttribute("width", `${size.width}`);
     this.svgDoc.setAttribute("height", `${size.height}`);
-
-    this.containerElement.appendChild(this.svgDoc);
 
     this.handleShapeClicked = this.handleShapeClicked.bind(this);
     this.handleMouseMovedOverShape = this.handleMouseMovedOverShape.bind(this);
