@@ -87,6 +87,26 @@ export class SVGTS {
     );
   }
 
+  getAllPolylines() {
+    const polylines: SVGTSPolyline[] = [];
+
+    const polylineElements = this.svgDoc.getElementsByClassName(
+      "svgts-polyline"
+    );
+    for (let i = 0; i < polylineElements.length; i++) {
+      const element = polylineElements[i];
+      polylines.push(
+        new SVGTSPolyline(
+          this.svgDoc,
+          this.handleShapeClicked,
+          this.handleMouseMovedOverShape,
+          element.id
+        )
+      );
+    }
+    return polylines;
+  }
+
   getCircle(circleId: string) {
     if (!document.getElementById(circleId)) {
       return null;
@@ -97,5 +117,23 @@ export class SVGTS {
       this.handleMouseMovedOverShape,
       circleId
     );
+  }
+
+  getAllCircles() {
+    const circles: SVGTSCircle[] = [];
+
+    const circleElements = this.svgDoc.getElementsByClassName("svgts-circle");
+    for (let i = 0; i < circleElements.length; i++) {
+      const element = circleElements[i];
+      circles.push(
+        new SVGTSCircle(
+          this.svgDoc,
+          this.handleShapeClicked,
+          this.handleMouseMovedOverShape,
+          element.id
+        )
+      );
+    }
+    return circles;
   }
 }

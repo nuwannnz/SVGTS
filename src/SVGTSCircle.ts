@@ -52,6 +52,7 @@ export class SVGTSCircle {
 
       this.initEventListners();
 
+      this.circleElement.classList.add("svgts-circle");
       this.svgDoc.appendChild(this.circleElement);
       this.injected = true;
       this.fill();

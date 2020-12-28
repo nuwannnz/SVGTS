@@ -54,7 +54,7 @@ export class SVGTSPolyline {
       this.polylineElement.addEventListener("mousemove", () => {
         this.onMouseMoveCb(this.polylineElement.id);
       });
-
+      this.polylineElement.classList.add("svgts-polyline");
       this.svgDoc.appendChild(this.polylineElement);
       this.stroke();
     }
